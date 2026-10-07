@@ -37,12 +37,11 @@ export async function POST() {
       return Response.json({ error: "Didit returned an invalid session response" }, { status: 502 });
     }
 
-    const { error: dbError } = await supabase.from("kyc_verifications").upsert({
-      user_id: user.id,
+    const { error: dbError } = await supabase.from("profiles").update({
+      verification_status: "In Progress",
       didit_session_id: session.session_id,
-      status: "IN_PROGRESS",
       updated_at: new Date().toISOString(),
-    }, { onConflict: "user_id" });
+    }).eq("id", user.id);
 
     if (dbError) {
       console.error("KYC DATABASE ERROR:", dbError.message);
